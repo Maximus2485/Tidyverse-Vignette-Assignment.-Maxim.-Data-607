@@ -1,0 +1,71 @@
+---
+title: "Tidyverse Vignette Assignment. Exploring IMDb Top 250 Movies with Tidyverse"
+author: "Maxim Arisov"
+format: html
+date: 11.2.26
+editor: visual
+---
+
+## Approach
+
+For this assignment, I will use the IMDb Top 250 Movies dataset to explore movie ratings.
+
+My research question is: **How do IMDb movie ratings compare across release decades?**
+
+At first, I will import the CSV file into R studio. Then, I will use dplyr to select movie titles, release years, and ratings. I will remove missing values and group movies by decade, such as the 1990s, 2000s, and 2010s.
+
+Next, I will calculate the average IMDb rating for each decade. Then, I use ggplot2 to create a graph to compare the results.
+
+This project will help me practice cleaning, organizing, summarizing, and visualizing data using Tidyverse packages.
+
+## Code Base
+
+```{r}
+library(tidyverse)
+
+movies <- read_csv("https://raw.githubusercontent.com/Maximus2485/Tidyverse-Vignette-Assignment.-Maxim.-Data-607/refs/heads/main/imdb_top_250_movies.csv")
+
+# Lets select useful columns and remove missing values
+movies_clean <- movies %>%
+  select(primaryTitle, startYear, averageRating) %>%
+  filter(!is.na(startYear), !is.na(averageRating)) %>%
+#I used mutate() to create a new column called Decade. This code changes each movie's release year into its decade. For example, a movie released in 1994 belongs to the 1990s. This helps me compare movie ratings across different decades.
+  mutate(Decade = (startYear %/% 10) * 10)
+
+
+# Find the average rating for each decade
+decade_summary <- movies_clean %>%
+  group_by(Decade) %>%
+  summarise(
+    Movie_Count = n(),
+    Average_Rating = mean(averageRating),
+    .groups = "drop"
+  )
+
+decade_summary
+
+# Create a graph
+ggplot(decade_summary, aes(x = Decade, y = Average_Rating)) +
+  geom_line(color = "blue") +
+  geom_point(size = 3) +
+  labs(
+    title = "Average IMDb Rating by Decade",
+    x = "Release Decade",
+    y = "Average Rating"
+  )
+
+```
+
+## Conclusion
+
+Thus, the graph shows the average IMDb movie ratings by decade. The 1990s have the highest average rating, around 8.41, while the 1920s have the lowest average rating, around 8.13.
+
+The ratings change slightly across different decades, but most average ratings are between 8.2 and 8.4.
+
+This shows that highly rated movies come from many different decades. However, there is no clear pattern showing that newer movies always have higher ratings than older movies.
+
+## References
+
+Google Deep Mind. (2026). Gemini 3 Flash \[Large language model\]. \[<https://gemini.google.com.%5D(https://gemini.google.com/)> Accessed November 2nd, 2026.
+
+Wickham, H., Çetinkaya-Rundel, M., & Grolemund, G. (2023). ***R for data science*** (2nd ed.). O'Reilly Media. <https://r4ds.hadley.nz/>
